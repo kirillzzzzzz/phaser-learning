@@ -70,6 +70,7 @@ export default class GameScene extends Phaser.Scene {
 		this.cameras.main.setBounds(0, 0, 1500, 1000);
 
 	}
+
 	createMap() {
 		this.map = this.make.tilemap({
 			key: 'level_001'
@@ -101,6 +102,7 @@ export default class GameScene extends Phaser.Scene {
 			}
 		);
 	}
+
 	createPlayer() {
 
 		this.player = new Player(
@@ -122,6 +124,7 @@ export default class GameScene extends Phaser.Scene {
 		);
 
 	}
+
 	createCoins() {
 
 		this.coins = this.physics.add.group();
@@ -143,6 +146,7 @@ export default class GameScene extends Phaser.Scene {
 
 		});
 	}
+
 	createAnimations() {
 
 		this.anims.create({
@@ -186,6 +190,7 @@ export default class GameScene extends Phaser.Scene {
 		});
 
 	}
+
 	createInput() {
 
 		this.cursors = this.input.keyboard.createCursorKeys();
@@ -198,6 +203,7 @@ export default class GameScene extends Phaser.Scene {
 		});
 
 	}
+
 	createScore() {
 		this.score = 0;
 
@@ -214,7 +220,9 @@ export default class GameScene extends Phaser.Scene {
 		this.scoreText.setScrollFactor(0);
 		this.scoreText.setDepth(1000);
 	}
+
 	createEnemy() {
+
 		this.enemy = this.physics.add.sprite(
 			600,
 			300,
@@ -222,9 +230,31 @@ export default class GameScene extends Phaser.Scene {
 			'hud_player_helmet_purple'
 		);
 
-		this.enemySpeed = 100;
+		this.enemyPatrolSpeed = 80;
+		this.enemyChaseSpeed = 120;
+
 		this.enemyDirection = 1;
+
+		this.enemyPatrolMinX = 450;
+		this.enemyPatrolMaxX = 750;
+
+		this.enemyVisionRadius = 250;
+
+		this.enemyState = 'patrol';
+
+		this.enemyIgnorePlayer = false;
+
+		this.enemyHitCooldown = false;
+
+		this.physics.add.collider(
+			this.player,
+			this.enemy,
+			this.hitByEnemy,
+			null,
+			this
+		);
 	}
+
 	createChest() {
 		this.chest = this.add.sprite(700, 550, 'tiles', 'block_exclamation_active');
 	}
@@ -239,6 +269,7 @@ export default class GameScene extends Phaser.Scene {
 			'Монеты: ' + this.score
 		);
 	}
+
 	overlabCoins() {
 		this.physics.add.overlap(
 			this.player,
@@ -250,19 +281,143 @@ export default class GameScene extends Phaser.Scene {
 	}
 
 	enemyMovement() {
-		this.enemy.setVelocityX(
-			this.enemySpeed * this.enemyDirection
-		);
 
-		if (this.enemy.x > 700) {
-			this.enemyDirection = -1;
+		// Враг временно игнорирует игрока
+		if (this.enemyIgnorePlayer) {
+
+			this.enemyPatrol();
+
+			return;
 		}
 
-		if (this.enemy.x < 100) {
+		// Расстояние до игрока
+		const distance = Phaser.Math.Distance.Between(
+			this.enemy.x,
+			this.enemy.y,
+			this.player.x,
+			this.player.y
+		);
+
+		// Если игрок достаточно близко —
+		// начинаем преследование
+		if (distance <= this.enemyVisionRadius) {
+
+			this.enemyState = 'chase';
+
+		} else {
+
+			this.enemyState = 'patrol';
+
+		}
+
+		// Выполняем текущее состояние
+
+		if (this.enemyState === 'patrol') {
+
+			this.enemyPatrol();
+
+		}
+
+		else if (this.enemyState === 'chase') {
+
+			this.enemyChase();
+
+		}
+
+	}
+
+	enemyPatrol() {
+
+		this.enemy.setVelocityX(
+			this.enemyPatrolSpeed * this.enemyDirection
+		);
+
+		this.enemy.setVelocityY(0);
+
+		if (this.enemy.x >= this.enemyPatrolMaxX) {
+
+			this.enemyDirection = -1;
+
+		}
+
+		if (this.enemy.x <= this.enemyPatrolMinX) {
+
 			this.enemyDirection = 1;
+
 		}
 
 		this.enemy.flipX =
 			this.enemyDirection < 0;
+
 	}
+
+	enemyChase() {
+
+		this.physics.moveToObject(
+			this.enemy,
+			this.player,
+			this.enemyChaseSpeed
+		);
+
+		this.enemy.flipX =
+			this.player.x < this.enemy.x;
+
+	}
+
+	hitByEnemy(player, enemy) {
+
+		if (this.enemyHitCooldown) {
+			return;
+		}
+
+		this.enemyHitCooldown = true;
+
+		// Враг перестает преследовать
+		this.enemyIgnorePlayer = true;
+
+		// Останавливаем врага
+		enemy.setVelocity(0);
+
+		// Определяем направление от врага к игроку
+		const angle = Phaser.Math.Angle.Between(
+			enemy.x,
+			enemy.y,
+			player.x,
+			player.y
+		);
+
+		// Отбрасываем игрока
+		const knockbackDistance = 128;
+
+		player.x += Math.cos(angle) * knockbackDistance;
+		player.y += Math.sin(angle) * knockbackDistance;
+
+		// Включаем мигание
+		this.playerBlink();
+
+		// Через 2 секунды возвращаем нормальное состояние
+		this.time.delayedCall(2000, () => {
+
+			this.enemyIgnorePlayer = false;
+
+			this.enemyHitCooldown = false;
+
+			this.player.setAlpha(1);
+
+		});
+
+	}
+
+	playerBlink() {
+
+		this.tweens.add({
+			targets: this.player,
+			alpha: 0,
+			duration: 100,
+			yoyo: true,
+			repeat: 9
+		});
+
+	}
+
 }
