@@ -111,6 +111,8 @@ export default class GameScene extends Phaser.Scene {
 			490
 		);
 
+		this.playerCanMove = true;
+
 		this.cameras.main.startFollow(
 			this.player,
 			true,
@@ -228,6 +230,11 @@ export default class GameScene extends Phaser.Scene {
 			300,
 			'tiles',
 			'hud_player_helmet_purple'
+		);
+
+		this.physics.add.collider(
+			this.enemy,
+			this.wallLayer
 		);
 
 		this.enemyPatrolSpeed = 80;
@@ -387,10 +394,23 @@ export default class GameScene extends Phaser.Scene {
 		);
 
 		// Отбрасываем игрока
-		const knockbackDistance = 128;
 
-		player.x += Math.cos(angle) * knockbackDistance;
-		player.y += Math.sin(angle) * knockbackDistance;
+		const knockbackForce = 400;
+
+		player.canMove = false;
+
+		player.setVelocity(
+			Math.cos(angle) * knockbackForce,
+			Math.sin(angle) * knockbackForce
+		);
+
+		this.time.delayedCall(300, () => {
+
+			player.setVelocity(0);
+
+			player.canMove = true;
+
+		});
 
 		// Включаем мигание
 		this.playerBlink();
