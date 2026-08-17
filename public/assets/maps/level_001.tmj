@@ -555,6 +555,19 @@
                  "width":64,
                  "x":256,
                  "y":640
+                }, 
+                {
+                 "gid":128,
+                 "height":64,
+                 "id":88,
+                 "name":"TreasureChest",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"chest",
+                 "visible":true,
+                 "width":64,
+                 "x":1024,
+                 "y":960
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -563,7 +576,7 @@
          "y":0
         }],
  "nextlayerid":4,
- "nextobjectid":88,
+ "nextobjectid":89,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

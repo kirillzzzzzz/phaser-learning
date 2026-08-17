@@ -32,6 +32,8 @@ export default class GameScene extends Phaser.Scene {
 
 	create() {
 
+		this.gameWon = false;
+
 		this.createWorld();
 
 		this.createMap();
@@ -42,11 +44,13 @@ export default class GameScene extends Phaser.Scene {
 
 		this.createScore();
 
+		this.createLives();
+
 		this.createCoins();
 
 		this.overlabCoins();
 
-		// this.createChest();
+		this.createChest();
 
 		this.createInput();
 
@@ -111,6 +115,8 @@ export default class GameScene extends Phaser.Scene {
 			490
 		);
 
+		this.playerLives = 3;
+
 		this.playerCanMove = true;
 
 		this.cameras.main.startFollow(
@@ -147,6 +153,37 @@ export default class GameScene extends Phaser.Scene {
 			}
 
 		});
+	}
+
+	createLives() {
+
+		this.livesText = this.add.text(
+			20,
+			60,
+			'Жизни: ❤️ ❤️ ❤️',
+			{
+				fontSize: '28px',
+				color: '#ffffff'
+			}
+		);
+
+		this.livesText.setScrollFactor(0);
+
+		this.livesText.setDepth(1000);
+	}
+
+	updateLives() {
+
+		let hearts = '';
+
+		for (let i = 0; i < this.playerLives; i++) {
+			hearts += '❤️ ';
+		}
+
+		this.livesText.setText(
+			'Жизни: ' + hearts
+		);
+
 	}
 
 	createAnimations() {
@@ -263,7 +300,51 @@ export default class GameScene extends Phaser.Scene {
 	}
 
 	createChest() {
-		this.chest = this.add.sprite(700, 550, 'tiles', 'block_exclamation_active');
+
+		const objectLayer = this.map.getObjectLayer('Objects');
+
+		const chestObject = objectLayer.objects.find(
+			obj => obj.type === 'chest'
+		);
+
+		if (!chestObject) {
+			console.warn('Сундук не найден');
+			return;
+		}
+
+		this.chest = this.physics.add.sprite(
+			chestObject.x + chestObject.width / 2,
+			chestObject.y - chestObject.height / 2,
+			'tiles',
+			'sign_exit'
+		);
+
+		this.physics.add.overlap(
+			this.player,
+			this.chest,
+			this.openChest,
+			null,
+			this
+		);
+
+	}
+
+	openChest(player, chest) {
+
+		if (this.gameWon) {
+			return;
+		}
+
+		this.gameWon = true;
+
+		player.canMove = false;
+
+		player.setVelocity(0);
+
+		this.enemy.setVelocity(0);
+
+		this.showWinScreen();
+
 	}
 
 	collectCoin(player, coin) {
@@ -379,6 +460,17 @@ export default class GameScene extends Phaser.Scene {
 
 		this.enemyHitCooldown = true;
 
+		this.playerLives--;
+
+		this.updateLives();
+
+		if (this.playerLives <= 0) {
+
+			this.gameOver();
+
+			return;
+		}
+
 		// Враг перестает преследовать
 		this.enemyIgnorePlayer = true;
 
@@ -437,6 +529,98 @@ export default class GameScene extends Phaser.Scene {
 			yoyo: true,
 			repeat: 9
 		});
+
+	}
+
+	gameOver() {
+
+		this.player.canMove = false;
+
+		this.enemy.setVelocity(0);
+
+		this.add.rectangle(
+			400,
+			300,
+			800,
+			600,
+			0x000000,
+			0.7
+		)
+			.setScrollFactor(0)
+			.setDepth(2000);
+
+		this.add.text(
+			400,
+			250,
+			'GAME OVER',
+			{
+				fontSize: '64px',
+				color: '#ffffff'
+			}
+		)
+			.setOrigin(0.5)
+			.setScrollFactor(0)
+			.setDepth(2001);
+
+		this.add.text(
+			400,
+			330,
+			'Игра перезапустится...',
+			{
+				fontSize: '24px',
+				color: '#ffffff'
+			}
+		)
+			.setOrigin(0.5)
+			.setScrollFactor(0)
+			.setDepth(2001);
+
+		this.time.delayedCall(2000, () => {
+
+			this.scene.restart();
+
+		});
+
+	}
+
+	showWinScreen() {
+
+		this.add.rectangle(
+			400,
+			300,
+			800,
+			600,
+			0x000000,
+			0.7
+		)
+			.setScrollFactor(0)
+			.setDepth(2000);
+
+		this.add.text(
+			400,
+			250,
+			'ПОБЕДА!',
+			{
+				fontSize: '64px',
+				color: '#ffffff'
+			}
+		)
+			.setOrigin(0.5)
+			.setScrollFactor(0)
+			.setDepth(2001);
+
+		this.add.text(
+			400,
+			330,
+			'Ты нашёл сокровище!',
+			{
+				fontSize: '26px',
+				color: '#ffffff'
+			}
+		)
+			.setOrigin(0.5)
+			.setScrollFactor(0)
+			.setDepth(2001);
 
 	}
 
