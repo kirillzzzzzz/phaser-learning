@@ -316,8 +316,10 @@ export default class GameScene extends Phaser.Scene {
 			chestObject.x + chestObject.width / 2,
 			chestObject.y - chestObject.height / 2,
 			'tiles',
-			'sign_exit'
+			'door_closed_top'
 		);
+
+		this.chestOpened = false;
 
 		this.physics.add.overlap(
 			this.player,
@@ -331,19 +333,100 @@ export default class GameScene extends Phaser.Scene {
 
 	openChest(player, chest) {
 
-		if (this.gameWon) {
+		if (this.gameWon || this.chestOpened) {
 			return;
 		}
 
+		this.chestOpened = true;
 		this.gameWon = true;
 
 		player.canMove = false;
-
 		player.setVelocity(0);
 
 		this.enemy.setVelocity(0);
 
-		this.showWinScreen();
+		this.openChestAnimation();
+	}
+
+	openChestAnimation() {
+
+		this.tweens.add({
+
+			targets: this.chest,
+
+			scale: 1.5,
+
+			duration: 300,
+
+			yoyo: true,
+
+			repeat: 2,
+
+			ease: 'Sine.easeInOut',
+
+			onComplete: () => {
+
+				this.createTreasureEffect();
+
+			}
+
+		});
+
+	}
+
+	createTreasureEffect() {
+
+		const coins = [];
+
+		for (let i = 0; i < 12; i++) {
+
+			const coin = this.add.sprite(
+				this.chest.x,
+				this.chest.y,
+				'tiles',
+				'coin_gold'
+			);
+
+			coin.setScale(1);
+			coin.setDepth(1500);
+
+			coins.push(coin);
+
+			const angle = Phaser.Math.DegToRad(i * 30);
+
+			const distance = 100;
+
+			const targetX =
+				this.chest.x + Math.cos(angle) * distance;
+
+			const targetY =
+				this.chest.y + Math.sin(angle) * distance;
+
+			this.tweens.add({
+
+				targets: coin,
+
+				x: targetX,
+				y: targetY,
+
+				duration: 1000,
+
+				ease: 'Cubic.easeOut'
+
+			});
+
+		}
+
+		// Ждём пока монетки разлетятся
+		this.time.delayedCall(1200, () => {
+
+			coins.forEach(coin => {
+				coin.destroy();
+			});
+
+			this.showWinScreen();
+
+		});
 
 	}
 
@@ -598,7 +681,7 @@ export default class GameScene extends Phaser.Scene {
 
 		this.add.text(
 			400,
-			250,
+			230,
 			'ПОБЕДА!',
 			{
 				fontSize: '64px',
@@ -611,7 +694,7 @@ export default class GameScene extends Phaser.Scene {
 
 		this.add.text(
 			400,
-			330,
+			310,
 			'Ты нашёл сокровище!',
 			{
 				fontSize: '26px',
@@ -621,6 +704,33 @@ export default class GameScene extends Phaser.Scene {
 			.setOrigin(0.5)
 			.setScrollFactor(0)
 			.setDepth(2001);
+
+		const restartButton = this.add.text(
+			400,
+			390,
+			'ИГРАТЬ СНОВА',
+			{
+				fontSize: '28px',
+				color: '#ffffff',
+				backgroundColor: '#444444',
+				padding: {
+					x: 20,
+					y: 10
+				}
+			}
+		)
+			.setOrigin(0.5)
+			.setScrollFactor(0)
+			.setDepth(2001)
+			.setInteractive({
+				useHandCursor: true
+			});
+
+		restartButton.on('pointerdown', () => {
+
+			this.scene.restart();
+
+		});
 
 	}
 

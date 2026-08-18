@@ -557,10 +557,10 @@
                  "y":640
                 }, 
                 {
-                 "gid":128,
+                 "gid":48,
                  "height":64,
-                 "id":88,
-                 "name":"TreasureChest",
+                 "id":92,
+                 "name":"",
                  "opacity":1,
                  "rotation":0,
                  "type":"chest",
@@ -576,7 +576,7 @@
          "y":0
         }],
  "nextlayerid":4,
- "nextobjectid":89,
+ "nextobjectid":93,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",
