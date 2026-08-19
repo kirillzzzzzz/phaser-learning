@@ -22,6 +22,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 	update(cursors, keys) {
 
 		if (!this.canMove) {
+
+			this.setVelocity(0);
+
+			this.stop();
+
 			return;
 		}
 

@@ -153,6 +153,8 @@ export default class GameScene extends Phaser.Scene {
 			}
 
 		});
+
+		this.totalCoins = this.coins.countActive();
 	}
 
 	createLives() {
@@ -319,7 +321,15 @@ export default class GameScene extends Phaser.Scene {
 			'door_closed_top'
 		);
 
+		this.chest.setImmovable(true);
+
 		this.chestOpened = false;
+		this.chestUnlocked = false;
+
+		this.physics.add.collider(
+			this.player,
+			this.chest
+		);
 
 		this.physics.add.overlap(
 			this.player,
@@ -333,7 +343,11 @@ export default class GameScene extends Phaser.Scene {
 
 	openChest(player, chest) {
 
-		if (this.gameWon || this.chestOpened) {
+		if (
+			this.gameWon ||
+			this.chestOpened ||
+			!this.chestUnlocked
+		) {
 			return;
 		}
 
@@ -348,23 +362,59 @@ export default class GameScene extends Phaser.Scene {
 		this.openChestAnimation();
 	}
 
+	unlockChest() {
+
+		if (this.chestUnlocked) {
+			return;
+		}
+
+		this.chestUnlocked = true;
+
+		this.chest.setFrame(
+			'door_open_top'
+		);
+
+		// Небольшая анимация,
+		// показывающая, что сундук разблокирован
+		this.tweens.add({
+
+			targets: this.chest,
+
+			scale: 1.25,
+
+			duration: 250,
+
+			yoyo: true,
+
+			repeat: 1,
+
+			ease: 'Sine.easeInOut'
+
+		});
+
+	}
+
 	openChestAnimation() {
 
 		this.tweens.add({
 
 			targets: this.chest,
 
-			scale: 1.5,
+			scale: 1.4,
 
-			duration: 300,
+			duration: 250,
 
 			yoyo: true,
 
 			repeat: 2,
 
-			ease: 'Sine.easeInOut',
+			ease: 'Back.easeOut',
 
 			onComplete: () => {
+
+				this.chest.setFrame(
+					'door_open_top'
+				);
 
 				this.createTreasureEffect();
 
@@ -439,6 +489,13 @@ export default class GameScene extends Phaser.Scene {
 		this.scoreText.setText(
 			'Монеты: ' + this.score
 		);
+
+		if (this.score >= this.totalCoins) {
+
+			this.unlockChest();
+
+		}
+
 	}
 
 	overlabCoins() {
