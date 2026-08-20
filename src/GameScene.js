@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import Player from './Player';
 
+const DEBUG_NAVIGATION = true;
+
 export default class GameScene extends Phaser.Scene {
 	constructor() {
 		super('GameScene');
@@ -40,6 +42,8 @@ export default class GameScene extends Phaser.Scene {
 
 		this.createPlayer();
 
+		this.createNavigationArrow();
+
 		this.createEnemy();
 
 		this.createScore();
@@ -51,6 +55,12 @@ export default class GameScene extends Phaser.Scene {
 		this.overlabCoins();
 
 		this.createChest();
+
+		this.createChest();
+
+		if (DEBUG_NAVIGATION) {
+			this.unlockChest();
+		}
 
 		this.createInput();
 
@@ -66,6 +76,8 @@ export default class GameScene extends Phaser.Scene {
 		);
 
 		this.enemyMovement();
+
+		this.updateNavigationArrow();
 
 	}
 
@@ -354,6 +366,8 @@ export default class GameScene extends Phaser.Scene {
 
 		this.enemy.setVelocity(0);
 
+		this.navigationArrow.setVisible(false);
+
 		this.openChestAnimation();
 	}
 
@@ -368,6 +382,10 @@ export default class GameScene extends Phaser.Scene {
 		this.chest.setFrame(
 			'door_open_top'
 		);
+
+		if (this.navigationArrow) {
+			this.navigationArrow.setVisible(true);
+		}
 
 		// Небольшая анимация,
 		// показывающая, что сундук разблокирован
@@ -786,4 +804,52 @@ export default class GameScene extends Phaser.Scene {
 
 	}
 
+	createNavigationArrow() {
+
+		this.navigationArrow = this.add.triangle(
+			0,
+			0,
+			18, 0,
+			-10, -10,
+			-10, 10,
+			0xffffff
+		);
+
+		this.navigationArrow.setDepth(2000);
+
+		this.navigationArrow.setVisible(false);
+
+		this.navigationArrowDistance = 55;
+	}
+
+	updateNavigationArrow() {
+
+		if (!this.navigationArrow) {
+			return;
+		}
+
+		if (!this.navigationArrow.visible) {
+			return;
+		}
+
+		if (!this.chest || !this.player) {
+			return;
+		}
+
+		const dx = this.chest.x - this.player.x;
+		const dy = this.chest.y - this.player.y;
+
+		const angle = Math.atan2(dy, dx);
+
+		this.navigationArrow.x =
+			this.player.x +
+			Math.cos(angle) * this.navigationArrowDistance;
+
+		this.navigationArrow.y =
+			this.player.y +
+			Math.sin(angle) * this.navigationArrowDistance;
+
+		this.navigationArrow.rotation = angle;
+
+	}
 }
