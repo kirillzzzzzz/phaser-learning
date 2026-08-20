@@ -328,11 +328,6 @@ export default class GameScene extends Phaser.Scene {
 
 		this.physics.add.collider(
 			this.player,
-			this.chest
-		);
-
-		this.physics.add.overlap(
-			this.player,
 			this.chest,
 			this.openChest,
 			null,
