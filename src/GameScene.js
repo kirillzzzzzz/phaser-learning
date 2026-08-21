@@ -66,9 +66,17 @@ export default class GameScene extends Phaser.Scene {
 
 		this.createAnimations();
 
+		this.gameReady = false;
+
+		this.preWarmPlayer();
+
 	}
 
 	update() {
+
+		if (!this.gameReady) {
+			return;
+		}
 
 		this.player.update(
 			this.cursors,
@@ -109,14 +117,14 @@ export default class GameScene extends Phaser.Scene {
 
 		this.wallLayer.setCollisionByExclusion([-1]);
 
-		this.wallLayer.renderDebug(
-			this.add.graphics(),
-			{
-				tileColor: null,
-				collidingTileColor: new Phaser.Display.Color(255, 0, 0, 100),
-				faceColor: new Phaser.Display.Color(0, 255, 0, 255)
-			}
-		);
+		// this.wallLayer.renderDebug(
+		// 	this.add.graphics(),
+		// 	{
+		// 		tileColor: null,
+		// 		collidingTileColor: new Phaser.Display.Color(255, 0, 0, 100),
+		// 		faceColor: new Phaser.Display.Color(0, 255, 0, 255)
+		// 	}
+		// );
 	}
 
 	createPlayer() {
@@ -134,8 +142,8 @@ export default class GameScene extends Phaser.Scene {
 		this.cameras.main.startFollow(
 			this.player,
 			true,
-			0.1,
-			0.1
+			1,
+			1
 		);
 
 		this.physics.add.collider(
@@ -644,6 +652,8 @@ export default class GameScene extends Phaser.Scene {
 
 		player.canMove = false;
 
+		player.isKnockedBack = true;
+
 		player.setVelocity(
 			Math.cos(angle) * knockbackForce,
 			Math.sin(angle) * knockbackForce
@@ -666,6 +676,10 @@ export default class GameScene extends Phaser.Scene {
 			this.enemyIgnorePlayer = false;
 
 			this.enemyHitCooldown = false;
+
+			player.isKnockedBack = false;
+
+			player.setVelocity(0);
 
 			this.player.setAlpha(1);
 
@@ -852,4 +866,44 @@ export default class GameScene extends Phaser.Scene {
 		this.navigationArrow.rotation = angle;
 
 	}
+
+	preWarmPlayer() {
+
+		const animations = [
+			'walk-down',
+			'walk-up',
+			'walk-right',
+			'walk-left'
+		];
+
+		this.player.setVisible(false);
+
+		let index = 0;
+
+		const warmNextAnimation = () => {
+
+			if (index >= animations.length) {
+
+				this.player.stop();
+				this.player.setVisible(true);
+
+				this.gameReady = true;
+
+				return;
+			}
+
+			const animation = animations[index];
+
+			this.player.play(animation);
+
+			index++;
+
+			this.time.delayedCall(100, warmNextAnimation);
+
+		};
+
+		warmNextAnimation();
+
+	}
+
 }

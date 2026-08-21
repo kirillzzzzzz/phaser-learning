@@ -17,11 +17,17 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
 		this.canMove = true;
 
+		this.isKnockedBack = false;
+
 	}
 
 	update(cursors, keys) {
 
 		if (!this.canMove) {
+
+			if (this.isKnockedBack) {
+				return;
+			}
 
 			this.setVelocity(0);
 
@@ -69,6 +75,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 			this.stop();
 
 		}
+
 	}
 
 }
