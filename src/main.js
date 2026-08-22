@@ -1,6 +1,5 @@
 import Phaser from 'phaser';
 import './style.css';
-
 import GameScene from './GameScene';
 
 const config = {
@@ -14,7 +13,7 @@ const config = {
 	physics: {
 		default: 'arcade',
 		arcade: {
-			debug: true
+			debug: false
 		}
 	},
 

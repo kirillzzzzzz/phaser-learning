@@ -68,15 +68,9 @@ export default class GameScene extends Phaser.Scene {
 
 		this.gameReady = false;
 
-		this.preWarmPlayer();
-
 	}
 
-	update() {
-
-		if (!this.gameReady) {
-			return;
-		}
+	update(time, delta) {
 
 		this.player.update(
 			this.cursors,
@@ -864,45 +858,6 @@ export default class GameScene extends Phaser.Scene {
 			Math.sin(angle) * this.navigationArrowDistance;
 
 		this.navigationArrow.rotation = angle;
-
-	}
-
-	preWarmPlayer() {
-
-		const animations = [
-			'walk-down',
-			'walk-up',
-			'walk-right',
-			'walk-left'
-		];
-
-		this.player.setVisible(false);
-
-		let index = 0;
-
-		const warmNextAnimation = () => {
-
-			if (index >= animations.length) {
-
-				this.player.stop();
-				this.player.setVisible(true);
-
-				this.gameReady = true;
-
-				return;
-			}
-
-			const animation = animations[index];
-
-			this.player.play(animation);
-
-			index++;
-
-			this.time.delayedCall(100, warmNextAnimation);
-
-		};
-
-		warmNextAnimation();
 
 	}
 
