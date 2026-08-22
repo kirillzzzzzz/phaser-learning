@@ -27,7 +27,7 @@ export default class GameScene extends Phaser.Scene {
 
 		this.load.tilemapTiledJSON(
 			'level_001',
-			'assets/maps/level_001.tmj'
+			'assets/maps/level_001.json'
 		);
 
 	}
@@ -66,11 +66,9 @@ export default class GameScene extends Phaser.Scene {
 
 		this.createAnimations();
 
-		this.gameReady = false;
-
 	}
 
-	update(time, delta) {
+	update() {
 
 		this.player.update(
 			this.cursors,
@@ -111,14 +109,6 @@ export default class GameScene extends Phaser.Scene {
 
 		this.wallLayer.setCollisionByExclusion([-1]);
 
-		// this.wallLayer.renderDebug(
-		// 	this.add.graphics(),
-		// 	{
-		// 		tileColor: null,
-		// 		collidingTileColor: new Phaser.Display.Color(255, 0, 0, 100),
-		// 		faceColor: new Phaser.Display.Color(0, 255, 0, 255)
-		// 	}
-		// );
 	}
 
 	createPlayer() {
