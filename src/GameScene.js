@@ -1,8 +1,6 @@
 import Phaser from 'phaser';
 import Player from './Player';
 
-const DEBUG_NAVIGATION = true;
-
 export default class GameScene extends Phaser.Scene {
 	constructor() {
 		super('GameScene');
@@ -57,10 +55,6 @@ export default class GameScene extends Phaser.Scene {
 		this.createChest();
 
 		this.createChest();
-
-		if (DEBUG_NAVIGATION) {
-			this.unlockChest();
-		}
 
 		this.createInput();
 
