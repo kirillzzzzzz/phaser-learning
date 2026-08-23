@@ -10,6 +10,11 @@ const config = {
 
 	backgroundColor: '#222',
 
+	scale: {
+		mode: Phaser.Scale.RESIZE,
+		autoCenter: Phaser.Scale.CENTER_BOTH
+	},
+
 	physics: {
 		default: 'arcade',
 		arcade: {

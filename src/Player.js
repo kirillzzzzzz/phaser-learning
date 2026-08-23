@@ -21,7 +21,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
 	}
 
-	update(cursors, keys) {
+	update(cursors, keys, joystick) {
+
+		const joystickVector = joystick
+			? joystick.getVector()
+			: { x: 0, y: 0 };
 
 		if (!this.canMove) {
 
@@ -38,7 +42,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
 		this.setVelocity(0);
 
-		if (keys.A.isDown || cursors.left.isDown) {
+		if (
+			cursors.left.isDown ||
+			keys.A.isDown ||
+			joystickVector.x < -0.2
+		) {
 
 			this.setVelocityX(-this.speed);
 
@@ -46,7 +54,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
 		}
 
-		else if (keys.D.isDown || cursors.right.isDown) {
+		else if (
+			cursors.right.isDown ||
+			keys.D.isDown ||
+			joystickVector.x > 0.2
+		) {
 
 			this.setVelocityX(this.speed);
 
@@ -54,7 +66,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
 		}
 
-		else if (keys.W.isDown || cursors.up.isDown) {
+		else if (
+			cursors.up.isDown ||
+			keys.W.isDown ||
+			joystickVector.y < -0.2
+		) {
 
 			this.setVelocityY(-this.speed);
 
@@ -62,7 +78,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
 		}
 
-		else if (keys.S.isDown || cursors.down.isDown) {
+		else if (
+			cursors.down.isDown ||
+			keys.S.isDown ||
+			joystickVector.y > 0.2
+		) {
 
 			this.setVelocityY(this.speed);
 
