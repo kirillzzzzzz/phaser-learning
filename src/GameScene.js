@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import Player from './Player';
-import VirtualJoystick from './VirtualJoystick';
+import DPad from './DPad';
 
 export default class GameScene extends Phaser.Scene {
 	constructor() {
@@ -57,49 +57,9 @@ export default class GameScene extends Phaser.Scene {
 
 		this.createInput();
 
-		this.joystick = new VirtualJoystick(this);
-
-		if (this.sys.game.device.input.touch) {
-			this.joystick.show();
-		}
+		this.joystick = new DPad(this);
 
 		this.createAnimations();
-
-		console.group('📐 Treasure Hunter — экран');
-
-		console.log('Размер Phaser:',
-			Math.round(this.scale.width),
-			'x',
-			Math.round(this.scale.height)
-		);
-
-		console.log('Размер браузера:',
-			window.innerWidth,
-			'x',
-			window.innerHeight
-		);
-
-		console.log('Ориентация:',
-			window.innerWidth >= window.innerHeight
-				? 'landscape'
-				: 'portrait'
-		);
-
-		console.log('Touch:',
-			this.sys.game.device.input.touch);
-
-		console.groupEnd();
-
-		console.group('🎮 Virtual Joystick');
-
-		console.log('Touch device:',
-			this.sys.game.device.input.touch
-		);
-
-		console.log('Joystick:',
-			this.joystick);
-
-		console.groupEnd();
 
 	}
 
