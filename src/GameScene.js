@@ -34,8 +34,6 @@ export default class GameScene extends Phaser.Scene {
 
 	create() {
 
-		this.gameWon = false;
-
 		this.createWorld();
 
 		this.createMap();
@@ -45,6 +43,8 @@ export default class GameScene extends Phaser.Scene {
 		this.createNavigationArrow();
 
 		this.createEnemy();
+
+		this.gameWon = false;
 
 		this.createScore();
 
@@ -119,6 +119,8 @@ export default class GameScene extends Phaser.Scene {
 			490
 		);
 
+		this.player.setDepth(20);
+
 		this.playerLives = 3;
 
 		this.playerCanMove = true;
@@ -153,6 +155,8 @@ export default class GameScene extends Phaser.Scene {
 					'tiles',
 					'coin_gold'
 				);
+
+				this.coins.setDepth(5);
 
 			}
 
@@ -283,6 +287,8 @@ export default class GameScene extends Phaser.Scene {
 			'hud_player_helmet_purple'
 		);
 
+		this.enemy.setDepth(10);
+
 		this.physics.add.collider(
 			this.enemy,
 			this.wallLayer
@@ -304,7 +310,7 @@ export default class GameScene extends Phaser.Scene {
 
 		this.enemyHitCooldown = false;
 
-		this.physics.add.collider(
+		this.enemyPlayerCollider = this.physics.add.collider(
 			this.player,
 			this.enemy,
 			this.hitByEnemy,
@@ -361,8 +367,13 @@ export default class GameScene extends Phaser.Scene {
 		this.chestOpened = true;
 		this.gameWon = true;
 
-		player.canMove = false;
-		player.setVelocity(0);
+		// Отключаем столкновение игрока с врагом
+		if (this.enemyPlayerCollider) {
+			this.enemyPlayerCollider.active = false;
+		}
+
+		this.player.canMove = false;
+		this.player.setVelocity(0);
 
 		this.enemy.setVelocity(0);
 
@@ -606,6 +617,10 @@ export default class GameScene extends Phaser.Scene {
 	}
 
 	hitByEnemy(player, enemy) {
+
+		if (this.gameWon) {
+			return;
+		}
 
 		if (this.enemyHitCooldown) {
 			return;
