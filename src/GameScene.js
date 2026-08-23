@@ -75,7 +75,9 @@ export default class GameScene extends Phaser.Scene {
 			this.keys
 		);
 
-		this.enemyMovement();
+		if (!this.gameWon) {
+			this.enemyMovement();
+		}
 
 		this.updateNavigationArrow();
 
