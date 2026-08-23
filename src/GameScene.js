@@ -194,45 +194,53 @@ export default class GameScene extends Phaser.Scene {
 
 	createAnimations() {
 
-		this.anims.create({
-			key: 'walk-down',
-			frames: this.anims.generateFrameNumbers('player', {
-				start: 0,
-				end: 3
-			}),
-			frameRate: 8,
-			repeat: -1
-		});
+		if (!this.anims.exists('walk-down')) {
+			this.anims.create({
+				key: 'walk-down',
+				frames: this.anims.generateFrameNumbers('player', {
+					start: 0,
+					end: 3
+				}),
+				frameRate: 8,
+				repeat: -1
+			});
+		}
 
-		this.anims.create({
-			key: 'walk-up',
-			frames: this.anims.generateFrameNumbers('player', {
-				start: 4,
-				end: 7
-			}),
-			frameRate: 8,
-			repeat: -1
-		});
+		if (!this.anims.exists('walk-up')) {
+			this.anims.create({
+				key: 'walk-up',
+				frames: this.anims.generateFrameNumbers('player', {
+					start: 4,
+					end: 7
+				}),
+				frameRate: 8,
+				repeat: -1
+			});
+		}
 
-		this.anims.create({
-			key: 'walk-right',
-			frames: this.anims.generateFrameNumbers('player', {
-				start: 8,
-				end: 11
-			}),
-			frameRate: 8,
-			repeat: -1
-		});
+		if (!this.anims.exists('walk-right')) {
+			this.anims.create({
+				key: 'walk-right',
+				frames: this.anims.generateFrameNumbers('player', {
+					start: 8,
+					end: 11
+				}),
+				frameRate: 8,
+				repeat: -1
+			});
+		}
 
-		this.anims.create({
-			key: 'walk-left',
-			frames: this.anims.generateFrameNumbers('player', {
-				start: 12,
-				end: 15
-			}),
-			frameRate: 8,
-			repeat: -1
-		});
+		if (!this.anims.exists('walk-left')) {
+			this.anims.create({
+				key: 'walk-left',
+				frames: this.anims.generateFrameNumbers('player', {
+					start: 12,
+					end: 15
+				}),
+				frameRate: 8,
+				repeat: -1
+			});
+		}
 
 	}
 
