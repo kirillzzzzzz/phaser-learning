@@ -16,10 +16,16 @@ export default class DPad {
 		this.buttons = {};
 
 		this.createButtons();
-
 		this.updateLayout();
 
-		scene.scale.on('resize', this.handleResize, this);
+		this.activeButton = null;
+
+		this.scene.scale.on('resize', this.handleResize, this);
+
+		this.scene.input.on('pointerdown', this.handlePointerDown, this);
+		this.scene.input.on('pointermove', this.handlePointerMove, this);
+		this.scene.input.on('pointerup', this.handlePointerUp, this);
+		this.scene.input.on('pointerupoutside', this.handlePointerUp, this);
 	}
 
 	createButtons() {
@@ -30,6 +36,7 @@ export default class DPad {
 	}
 
 	createButton(label) {
+
 		const button = this.scene.add
 			.rectangle(
 				0,
@@ -41,8 +48,7 @@ export default class DPad {
 			)
 			.setOrigin(0.5)
 			.setScrollFactor(0)
-			.setDepth(2000)
-			.setInteractive();
+			.setDepth(2000);
 
 		button.setStrokeStyle(2, 0xffffff, 0.25);
 
@@ -57,42 +63,103 @@ export default class DPad {
 			.setScrollFactor(0)
 			.setDepth(2001);
 
-		arrow.setPosition(
-			button.x,
-			button.y
-		);
+		arrow.setPosition(button.x, button.y);
 
 		button.arrow = arrow;
-
-		button.on('pointerdown', () => {
-			this.setDirection(label, true);
-
-			button.setFillStyle(0xffffff, 0.35);
-			arrow.setColor('#222222');
-		});
-
-		button.on('pointerup', () => {
-			this.setDirection(label, false);
-
-			button.setFillStyle(0x000000, 0.4);
-			arrow.setColor('#ffffff');
-		});
-
-		button.on('pointerout', () => {
-			this.setDirection(label, false);
-
-			button.setFillStyle(0x000000, 0.4);
-			arrow.setColor('#ffffff');
-		});
-
-		button.on('pointerupoutside', () => {
-			this.setDirection(label, false);
-
-			button.setFillStyle(0x000000, 0.4);
-			arrow.setColor('#ffffff');
-		});
+		button.label = label;
 
 		return button;
+	}
+
+	getButtonAt(pointer) {
+
+		for (const button of Object.values(this.buttons)) {
+
+			const bounds = button.getBounds();
+
+			if (bounds.contains(pointer.x, pointer.y)) {
+				return button;
+			}
+		}
+
+		return null;
+	}
+
+
+	setActiveButton(button) {
+
+		// Если палец уже находится на этой же кнопке —
+		// ничего не делаем
+		if (this.activeButton === button) {
+			return;
+		}
+
+		// Сначала выключаем старую кнопку
+		if (this.activeButton) {
+
+			this.setDirection(
+				this.activeButton.label,
+				false
+			);
+
+			this.activeButton.setFillStyle(
+				0x000000,
+				0.4
+			);
+
+			this.activeButton.arrow.setColor(
+				'#ffffff'
+			);
+		}
+
+		this.activeButton = button;
+
+		// Если палец ушёл за пределы D-pad
+		if (!button) {
+			return;
+		}
+
+		// Включаем новую кнопку
+		this.setDirection(
+			button.label,
+			true
+		);
+
+		button.setFillStyle(
+			0xffffff,
+			0.35
+		);
+
+		button.arrow.setColor(
+			'#222222'
+		);
+	}
+
+
+	handlePointerDown(pointer) {
+
+		const button = this.getButtonAt(pointer);
+
+		this.setActiveButton(button);
+	}
+
+
+	handlePointerMove(pointer) {
+
+		// Нас интересует только движение зажатого пальца
+		if (!pointer.isDown) {
+			return;
+		}
+
+		const button = this.getButtonAt(pointer);
+
+		this.setActiveButton(button);
+	}
+
+
+	handlePointerUp(pointer) {
+
+		this.setActiveButton(null);
 	}
 
 	setDirection(label, value) {
@@ -184,14 +251,41 @@ export default class DPad {
 	}
 
 	destroy() {
+
 		this.scene.scale.off(
 			'resize',
 			this.handleResize,
 			this
 		);
 
+		this.scene.input.off(
+			'pointerdown',
+			this.handlePointerDown,
+			this
+		);
+
+		this.scene.input.off(
+			'pointermove',
+			this.handlePointerMove,
+			this
+		);
+
+		this.scene.input.off(
+			'pointerup',
+			this.handlePointerUp,
+			this
+		);
+
+		this.scene.input.off(
+			'pointerupoutside',
+			this.handlePointerUp,
+			this
+		);
+
 		Object.values(this.buttons).forEach(button => {
+			button.arrow.destroy();
 			button.destroy();
 		});
 	}
+
 }
