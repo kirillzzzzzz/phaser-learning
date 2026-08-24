@@ -1,4 +1,7 @@
 import Phaser from 'phaser';
+
+console.log("🛠️ TREASURE HUNTER — VIBRATION PATCH v1");
+
 import './style.css';
 import GameScene from './GameScene';
 

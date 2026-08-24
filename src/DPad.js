@@ -25,8 +25,8 @@ export default class DPad {
 	createButtons() {
 		this.buttons.up = this.createButton('▲');
 		this.buttons.down = this.createButton('▼');
-		this.buttons.left = this.createButton('◀');
-		this.buttons.right = this.createButton('▶');
+		this.buttons.left = this.createButton('◄');
+		this.buttons.right = this.createButton('►');
 	}
 
 	createButton(label) {
@@ -104,11 +104,11 @@ export default class DPad {
 			this.down = value;
 		}
 
-		if (label === '◀') {
+		if (label === '◄') {
 			this.left = value;
 		}
 
-		if (label === '▶') {
+		if (label === '►') {
 			this.right = value;
 		}
 	}

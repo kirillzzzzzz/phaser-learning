@@ -57,7 +57,18 @@ export default class GameScene extends Phaser.Scene {
 
 		this.createInput();
 
-		this.joystick = new DPad(this);
+		if (this.sys.game.device.input.touch) {
+			this.joystick = new DPad(this);
+		} else {
+			this.joystick = null;
+		}
+
+		console.group('🎮 Управление');
+
+		console.log('Touch device:', this.sys.game.device.input.touch);
+		console.log('D-pad:', this.joystick ? 'создан' : 'не создан');
+
+		console.groupEnd();
 
 		this.createAnimations();
 
