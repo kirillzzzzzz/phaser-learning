@@ -6,6 +6,44 @@
 	<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>phaser-learning</title>
+
+	<script src="/sdk.js"></script>
+
+	<script>
+		function wait(ms) {
+			return new Promise(resolve => setTimeout(resolve, ms));
+		}
+
+		async function waitForYaGames(timeout = 10000) {
+
+			const start = Date.now();
+
+			while (!window.YaGames) {
+
+				if (Date.now() - start > timeout) {
+					throw new Error('YaGames SDK was not loaded within 10 seconds');
+				}
+
+				await wait(50);
+			}
+
+			return window.YaGames;
+		}
+
+		window.ysdkPromise = (async () => {
+
+			const YaGames = await waitForYaGames();
+
+			const ysdk = await YaGames.init();
+
+			window.ysdk = ysdk;
+			window.gameLanguage = ysdk.environment.i18n.lang;
+
+			return ysdk;
+
+		})();
+	</script>
+
 </head>
 
 <body>
